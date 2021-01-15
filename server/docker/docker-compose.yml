@@ -1,0 +1,26 @@
+version: "3"
+
+services: 
+
+  pgdb: 
+    build: 
+       context: ../
+       dockerfile: ./docker/Dockerfile.pg
+    container_name: goappdb
+    restart: always
+    ports: 
+       - 5432:5432
+
+  goapp:
+    build: 
+       context: ../
+       dockerfile: ./docker/Dockerfile.server
+    container_name: goappserver
+    restart: always
+    volumes:
+       - ..:/go/app
+    depends_on:
+       - "pgdb"
+    ports: 
+       - 8080:8080
+

@@ -1,0 +1,13 @@
+FROM postgres:13
+
+ENV POSTGRES_PASSWORD=123456
+ENV POSTGRES_USER=rootpg
+ENV POSTGRES_DB=mediumclone
+ENV POSTGRES_HOST_AUTH_METHOD=trust
+
+VOLUME "/docker-data/pg:/var/lib/postgresql/data"
+
+# if you have an existing .sql file put it in /docker-dev-data/sql-data
+COPY ./docker-dev-data/sql-data ./docker-entrypoint-initdb.d
+
+EXPOSE 5432
