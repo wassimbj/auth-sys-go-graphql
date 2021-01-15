@@ -1,9 +1,9 @@
 package main
 
 import (
+	"auth-sys/graph"
+	"auth-sys/graph/generated"
 	"log"
-	"medium-clone/graph"
-	"medium-clone/graph/generated"
 	"net/http"
 	"os"
 

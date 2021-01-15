@@ -5,7 +5,7 @@ import (
 )
 
 func DB() *pg.DB {
-	// connStr := "postgres://rootpg:123456@localhost:5432/mediumclone"
+	// connStr := "postgres://rootpg:123456@localhost:5432/authsys"
 	// use opt as an option in the connect fn
 	// opt, err := pg.ParseURL(connStr)
 	// fmt.Println(opt)
@@ -15,7 +15,7 @@ func DB() *pg.DB {
 
 	db := pg.Connect(&pg.Options{
 		User:     "rootpg",
-		Database: "mediumclone",
+		Database: "authsys",
 		Password: "123456",
 		Addr:     "goappdb:5432", // "goappdb" is the postgres database container name
 		// Network:  "tcp", // default is tcp

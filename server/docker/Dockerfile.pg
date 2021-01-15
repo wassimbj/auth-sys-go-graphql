@@ -2,7 +2,7 @@ FROM postgres:13
 
 ENV POSTGRES_PASSWORD=123456
 ENV POSTGRES_USER=rootpg
-ENV POSTGRES_DB=mediumclone
+ENV POSTGRES_DB=authsys
 ENV POSTGRES_HOST_AUTH_METHOD=trust
 
 VOLUME "/docker-data/pg:/var/lib/postgresql/data"

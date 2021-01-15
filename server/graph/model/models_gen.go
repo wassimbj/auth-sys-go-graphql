@@ -2,27 +2,19 @@
 
 package model
 
-type Post struct {
-	ID        int      `json:"id"`
-	Slug      string   `json:"slug"`
-	Title     string   `json:"title"`
-	Body      string   `json:"body"`
-	Author    *User    `json:"author"`
-	Tags      []string `json:"tags"`
-	CreatedAt string   `json:"createdAt"`
-	Category  string   `json:"category"`
-}
-
-type PostData struct {
-	ID       int      `json:"id"`
-	Title    string   `json:"title"`
-	Body     string   `json:"body"`
-	Tags     []string `json:"tags"`
-	Category string   `json:"category"`
-}
-
 type User struct {
 	Name      string `json:"name"`
-	Image     string `json:"image"`
+	Email     string `json:"email"`
 	CreatedAt string `json:"createdAt"`
+}
+
+type CreateAccData struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginData struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

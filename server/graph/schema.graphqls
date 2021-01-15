@@ -4,37 +4,29 @@
 
 type User {
   name: String!
-  image: String!
+  email: String!
   createdAt: String!
-}
-
-type Post {
-  id: Int!
-  slug: String!
-  title: String!
-  body: String!
-  author: User!
-  tags: [String!]!
-  createdAt: String!
-  category: String!
 }
 
 type Query {
   getUser(id: Int): User!
-  getPost(slug: String!): Post!
 }
 
 
 # Mutation
 
-input PostData {
-  id: Int!
-  title: String!
-  body: String!
-  tags: [String!]!
-  category: String!
+input createAccData {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input loginData {
+  email: String!
+  password: String!
 }
 
 type Mutation {
-  createPost(data: PostData): Boolean!
+  createUser(data: createAccData): Boolean!
+  loginUser(data: loginData): Boolean!
 }
