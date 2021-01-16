@@ -18,7 +18,8 @@ type httpReqRes struct {
 	Res http.ResponseWriter
 }
 
-// Middleware decodes the share session cookie and packs the session into context
+// Middleware to pass the req/res objects to the context
+// so we can use them in the sessions parameters
 func GetReqRes() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +37,7 @@ func GetReqRes() func(http.Handler) http.Handler {
 	}
 }
 
-// ForContext finds the req/res from the context
+//  finds the req/res from the context
 func GetReqResCtx(ctx context.Context) *httpReqRes {
 	raw, _ := ctx.Value(httpCtxKey).(*httpReqRes)
 	return raw
