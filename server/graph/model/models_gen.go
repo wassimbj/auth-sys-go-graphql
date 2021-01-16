@@ -18,3 +18,7 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type LogoutData struct {
+	Out *bool `json:"out"`
+}

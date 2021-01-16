@@ -28,7 +28,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data *model.CreateAcc
 
 		return true, nil
 	} else {
-		return false, errors.New("you are not allowed to do this action")
+		return false, errors.New("You are not allowed to do this action")
 	}
 }
 
@@ -60,7 +60,29 @@ func (r *mutationResolver) LoginUser(ctx context.Context, data *model.LoginData)
 	}
 }
 
-func (r *queryResolver) GetUser(ctx context.Context, id *int) (*model.User, error) {
+func (r *mutationResolver) Logout(ctx context.Context, data *model.LogoutData) (bool, error) {
+	reqRes := middleware.GetReqResCtx(ctx)
+
+	authUserId := config.GetSession("id", reqRes.Req)
+
+	if authUserId != nil {
+
+		loggedOut := config.DeleteSession("id", reqRes.Res, reqRes.Req)
+
+		if loggedOut == true {
+			return true, nil
+		}
+
+		return false, errors.New("Can't log out, something went wrong...")
+	} else {
+		// get the stored user id
+		fmt.Println(
+			fmt.Sprintf("Your ID %T", authUserId))
+		return false, errors.New("You are not logged-in to logout")
+	}
+}
+
+func (r *queryResolver) GetAuthUser(ctx context.Context, id int) (*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

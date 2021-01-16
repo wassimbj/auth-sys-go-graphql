@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -18,6 +19,7 @@ var store = sessions.NewCookieStore([]byte(AppConfig().SESSION_ID))
 
 func SaveSession(userId interface{}, w http.ResponseWriter, r *http.Request) error {
 	store.Options.MaxAge = 60 * 60 * 24 * 2 // 2 days, MaxAge is in seconds
+
 	//------------------------ session-key/name
 	session, _ := store.Get(r, "user")
 	// Set some session values.
@@ -31,7 +33,25 @@ func SaveSession(userId interface{}, w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
-func GetSession(getKey string, r *http.Request) interface{} {
+func GetSession(key string, r *http.Request) interface{} {
 	session, _ := store.Get(r, "user")
-	return session.Values[getKey]
+	return session.Values[key]
+}
+
+func DeleteSession(key string, w http.ResponseWriter, r *http.Request) bool {
+	// session, _ := store.Get(r, "user")
+
+	// session.Options.MaxAge = -1 // val < 0 => delete cookie
+
+	session, _ := store.Get(r, "user")
+	// Set some session values.
+	session.Values[key] = nil
+	// Save it before we write to the response/return from the handler.
+	err := session.Save(r, w)
+	if err != nil {
+		log.Fatal("Logout ERROR: " + err.Error())
+		return false
+	}
+
+	return true
 }

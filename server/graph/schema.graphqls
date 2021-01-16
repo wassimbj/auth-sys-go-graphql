@@ -9,7 +9,7 @@ type User {
 }
 
 type Query {
-  getUser(id: Int): User!
+  getAuthUser(id: Int!): User!
 }
 
 
@@ -26,7 +26,12 @@ input loginData {
   password: String!
 }
 
+input logoutData{
+  out: Boolean
+}
+
 type Mutation {
   createUser(data: createAccData): Boolean!
   loginUser(data: loginData): Boolean!
+  logout(data: logoutData): Boolean!
 }
