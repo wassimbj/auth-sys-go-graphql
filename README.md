@@ -34,7 +34,7 @@ mutation {
 # login
 mutation {
   loginUser(data: {
-    email: "leila@gmail.com",
+    email: "yourname@gmail.com",
     password: "12345"
   })
 }
