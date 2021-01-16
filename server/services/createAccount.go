@@ -8,7 +8,7 @@ import (
 )
 
 type NewUser struct {
-	tableName struct{} `pg:"users"`
+	tableName struct{} `pg:"users"` // https://pg.uptrace.dev/models/
 	Fullname  string
 	Email     string
 	Password  string

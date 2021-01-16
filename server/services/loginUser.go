@@ -9,16 +9,11 @@ import (
 )
 
 type User struct {
-	tableName struct{} `pg:"users"`
+	tableName struct{} `pg:"users"` // https://pg.uptrace.dev/models/
 	Id        int
 	Email     string
 	Password  string
 }
-
-// type httpReqRes struct {
-// 	Req *http.Request
-// 	Res http.ResponseWriter
-// }
 
 func LoginUser(email, password string) (bool, int) {
 
@@ -41,7 +36,6 @@ func LoginUser(email, password string) (bool, int) {
 		fmt.Println("User is found !")
 
 		return true, foundedUser[0].Id
-		// config.SaveSession(foundedUser[0].Id)
 
 	} else {
 		log.Println("Email and Password are incorrect")

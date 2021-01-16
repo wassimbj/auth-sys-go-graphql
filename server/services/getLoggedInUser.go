@@ -6,7 +6,7 @@ import (
 )
 
 type LoggedInUser struct {
-	tableName struct{} `pg:"users,select:users"`
+	tableName struct{} `pg:"users,select:users"` // https://pg.uptrace.dev/models/
 	Id        int
 	Fullname  string
 	Email     string
