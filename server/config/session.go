@@ -39,10 +39,6 @@ func GetSession(key string, r *http.Request) interface{} {
 }
 
 func DeleteSession(key string, w http.ResponseWriter, r *http.Request) bool {
-	// session, _ := store.Get(r, "user")
-
-	// session.Options.MaxAge = -1 // val < 0 => delete cookie
-
 	session, _ := store.Get(r, "user")
 	// Set some session values.
 	session.Values[key] = nil

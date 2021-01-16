@@ -15,7 +15,7 @@ func TestServices(t *testing.T) {
 	})
 
 	t.Run("Login user to his account", func(t *testing.T) {
-		s := services.LoginUser("wassim@gmail.com", "12345")
+		s, _ := services.LoginUser("wassim@gmail.com", "12345")
 
 		if s != true {
 			t.FailNow()
