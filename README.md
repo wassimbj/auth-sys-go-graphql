@@ -1,4 +1,10 @@
-> this is a simple signup/login and logout system, **using GO, GraphQL, Postgres and Docker**
+> this is a simple signup/login system, **using GO, GraphQL, Postgres and Docker**
+
+**Functionalities:**  
+- create account
+- login to an account
+- logout
+- get the logged in user data
 
 #### Development
 first of all, clone the repo.  
