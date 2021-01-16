@@ -58,3 +58,5 @@ query {
   }
 }
 ```
+
+**The Front end part will come soon, but you can implement it by your own if you want**
