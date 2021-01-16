@@ -3,6 +3,7 @@
 package model
 
 type User struct {
+	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	CreatedAt string `json:"createdAt"`
@@ -17,8 +18,4 @@ type CreateAccData struct {
 type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-type LogoutData struct {
-	Out *bool `json:"out"`
 }

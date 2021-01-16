@@ -46,16 +46,17 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateUser func(childComplexity int, data *model.CreateAccData) int
 		LoginUser  func(childComplexity int, data *model.LoginData) int
-		Logout     func(childComplexity int, data *model.LogoutData) int
+		Logout     func(childComplexity int) int
 	}
 
 	Query struct {
-		GetAuthUser func(childComplexity int, id int) int
+		GetAuthUser func(childComplexity int) int
 	}
 
 	User struct {
 		CreatedAt func(childComplexity int) int
 		Email     func(childComplexity int) int
+		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 	}
 }
@@ -63,10 +64,10 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateUser(ctx context.Context, data *model.CreateAccData) (bool, error)
 	LoginUser(ctx context.Context, data *model.LoginData) (bool, error)
-	Logout(ctx context.Context, data *model.LogoutData) (bool, error)
+	Logout(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
-	GetAuthUser(ctx context.Context, id int) (*model.User, error)
+	GetAuthUser(ctx context.Context) (*model.User, error)
 }
 
 type executableSchema struct {
@@ -113,24 +114,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_logout_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.Logout(childComplexity, args["data"].(*model.LogoutData)), true
+		return e.complexity.Mutation.Logout(childComplexity), true
 
 	case "Query.getAuthUser":
 		if e.complexity.Query.GetAuthUser == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getAuthUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetAuthUser(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.GetAuthUser(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -145,6 +136,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Email(childComplexity), true
+
+	case "User.id":
+		if e.complexity.User.ID == nil {
+			break
+		}
+
+		return e.complexity.User.ID(childComplexity), true
 
 	case "User.name":
 		if e.complexity.User.Name == nil {
@@ -222,13 +220,14 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type User {
+  id: Int!
   name: String!
   email: String!
   createdAt: String!
 }
 
 type Query {
-  getAuthUser(id: Int!): User!
+  getAuthUser: User!
 }
 
 
@@ -245,14 +244,11 @@ input loginData {
   password: String!
 }
 
-input logoutData{
-  out: Boolean
-}
 
 type Mutation {
   createUser(data: createAccData): Boolean!
   loginUser(data: loginData): Boolean!
-  logout(data: logoutData): Boolean!
+  logout: Boolean!
 }
 `, BuiltIn: false},
 }
@@ -292,21 +288,6 @@ func (ec *executionContext) field_Mutation_loginUser_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_logout_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.LogoutData
-	if tmp, ok := rawArgs["data"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg0, err = ec.unmarshalOlogoutData2ᚖauthᚑsysᚋgraphᚋmodelᚐLogoutData(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["data"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -319,21 +300,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getAuthUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
 	return args, nil
 }
 
@@ -475,16 +441,9 @@ func (ec *executionContext) _Mutation_logout(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_logout_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Logout(rctx, args["data"].(*model.LogoutData))
+		return ec.resolvers.Mutation().Logout(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -517,16 +476,9 @@ func (ec *executionContext) _Query_getAuthUser(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_getAuthUser_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAuthUser(rctx, args["id"].(int))
+		return ec.resolvers.Query().GetAuthUser(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -612,6 +564,41 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -1870,26 +1857,6 @@ func (ec *executionContext) unmarshalInputloginData(ctx context.Context, obj int
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputlogoutData(ctx context.Context, obj interface{}) (model.LogoutData, error) {
-	var it model.LogoutData
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "out":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("out"))
-			it.Out, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -1994,6 +1961,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
+		case "id":
+			out.Values[i] = ec._User_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "name":
 			out.Values[i] = ec._User_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2788,14 +2760,6 @@ func (ec *executionContext) unmarshalOloginData2ᚖauthᚑsysᚋgraphᚋmodelᚐ
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputloginData(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOlogoutData2ᚖauthᚑsysᚋgraphᚋmodelᚐLogoutData(ctx context.Context, v interface{}) (*model.LogoutData, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputlogoutData(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

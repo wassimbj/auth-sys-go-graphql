@@ -3,13 +3,14 @@
 # https://gqlgen.com/getting-started/
 
 type User {
+  id: Int!
   name: String!
   email: String!
   createdAt: String!
 }
 
 type Query {
-  getAuthUser(id: Int!): User!
+  getAuthUser: User!
 }
 
 
@@ -26,12 +27,9 @@ input loginData {
   password: String!
 }
 
-input logoutData{
-  out: Boolean
-}
 
 type Mutation {
   createUser(data: createAccData): Boolean!
   loginUser(data: loginData): Boolean!
-  logout(data: logoutData): Boolean!
+  logout: Boolean!
 }

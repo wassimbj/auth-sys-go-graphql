@@ -60,7 +60,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context, data *model.LoginData)
 	}
 }
 
-func (r *mutationResolver) Logout(ctx context.Context, data *model.LogoutData) (bool, error) {
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
 	reqRes := middleware.GetReqResCtx(ctx)
 
 	authUserId := config.GetSession("id", reqRes.Req)
@@ -82,8 +82,26 @@ func (r *mutationResolver) Logout(ctx context.Context, data *model.LogoutData) (
 	}
 }
 
-func (r *queryResolver) GetAuthUser(ctx context.Context, id int) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) GetAuthUser(ctx context.Context) (*model.User, error) {
+	// GetLoggedInUser
+	reqRes := middleware.GetReqResCtx(ctx)
+
+	authUserId := config.GetSession("id", reqRes.Req)
+	// fmt.Println(authUserId)
+
+	if authUserId != nil {
+		user := services.GetLoggedInUser(authUserId)
+		userData := &model.User{
+			ID:        user.Id,
+			Name:      user.Fullname,
+			Email:     user.Email,
+			CreatedAt: user.Createdat,
+		}
+
+		return userData, nil
+	} else {
+		return &model.User{}, errors.New("login first")
+	}
 }
 
 // Mutation returns generated.MutationResolver implementation.
