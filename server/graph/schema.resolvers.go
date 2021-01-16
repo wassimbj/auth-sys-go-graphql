@@ -15,15 +15,21 @@ import (
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, data *model.CreateAccData) (bool, error) {
-	// panic(fmt.Errorf("not implemented"))
-	// fmt.Println(data)
-	success := services.CreateAccount(data.Name, data.Email, data.Password)
+	reqRes := middleware.GetReqResCtx(ctx)
 
-	if success == true {
+	authUserId := config.GetSession("id", reqRes.Req)
+
+	if authUserId == nil {
+		success := services.CreateAccount(data.Name, data.Email, data.Password)
+
+		if success == false {
+			return false, errors.New("Something went wrong")
+		}
+
 		return true, nil
+	} else {
+		return false, errors.New("you are not allowed to do this action")
 	}
-
-	return false, errors.New("Something went wrong")
 }
 
 func (r *mutationResolver) LoginUser(ctx context.Context, data *model.LoginData) (bool, error) {
@@ -48,8 +54,8 @@ func (r *mutationResolver) LoginUser(ctx context.Context, data *model.LoginData)
 		return true, nil
 	} else {
 		// get the stored user id
-		fmt.Print("You ID: ")
-		fmt.Println(authUserId)
+		fmt.Println(
+			fmt.Sprintf("Your ID %d", authUserId))
 		return false, errors.New("You are already logged in")
 	}
 }
