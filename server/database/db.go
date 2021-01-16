@@ -17,8 +17,9 @@ func DB() *pg.DB {
 		User:     "rootpg",
 		Database: "authsys",
 		Password: "123456",
-		Addr:     "goappdb:5432", // "goappdb" is the postgres database container name
-		// Network:  "tcp", // default is tcp
+		// both of this works, but when i run go test, i get an error that goappdb host doesn't exist.
+		// Addr:     "goappdb:5432", // "goappdb" is the postgres database container name
+		Addr: "192.168.1.12:5432", // my local IPv4 address, type "ipconfig" if you are in windows and you shall see it at first.
 	})
 
 	return db

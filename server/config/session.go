@@ -18,7 +18,7 @@ var store = sessions.NewCookieStore([]byte(AppConfig().SESSION_ID))
 
 func SaveSession(userId interface{}, w http.ResponseWriter, r *http.Request) error {
 	store.Options.MaxAge = 60 * 60 * 24 * 2 // 2 days, MaxAge is in seconds
-
+	//------------------------ session-key/name
 	session, _ := store.Get(r, "user")
 	// Set some session values.
 	session.Values["id"] = userId

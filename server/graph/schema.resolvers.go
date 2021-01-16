@@ -4,8 +4,10 @@ package graph
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
+	"auth-sys/config"
 	"auth-sys/graph/generated"
 	"auth-sys/graph/model"
+	middleware "auth-sys/middlewares"
 	"auth-sys/services"
 	"context"
 	"errors"
@@ -25,7 +27,31 @@ func (r *mutationResolver) CreateUser(ctx context.Context, data *model.CreateAcc
 }
 
 func (r *mutationResolver) LoginUser(ctx context.Context, data *model.LoginData) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	reqRes := middleware.GetReqResCtx(ctx)
+
+	authUserId := config.GetSession("id", reqRes.Req)
+
+	if authUserId == nil {
+
+		isUserAuth, userId := services.LoginUser(data.Email, data.Password)
+
+		if isUserAuth == true {
+			saveSesErr := config.SaveSession(userId, reqRes.Res, reqRes.Req)
+
+			if saveSesErr != nil {
+				return false, errors.New("Error while saving the user in the session" + saveSesErr.Error())
+			}
+		} else {
+			return false, errors.New("Unable to authenticate, check email or password")
+		}
+
+		return true, nil
+	} else {
+		// get the stored user id
+		fmt.Print("You ID: ")
+		fmt.Println(authUserId)
+		return false, errors.New("You are already logged in")
+	}
 }
 
 func (r *queryResolver) GetUser(ctx context.Context, id *int) (*model.User, error) {
